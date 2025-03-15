@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dessert Shop</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="desserts-header">Desserts</h1>
+        <section id="dessert-list" class="grid-container"></section>
+    </div>
+    </main>
+    <aside id="cart">
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <p>Total: $<span id="cart-total">0.00</span></p>
+        <button onclick="confirmOrder()">Confirm Order</button>
+    </aside>
+    <div id="order-confirmation" class="hidden">
+        <h2>Order Confirmed</h2>
+        <p>We hope you enjoy your food!</p>
+        <button onclick="startNewOrder()">Start New Order</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("./assets/data.json")  // Make sure the path matches your folder structure
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Data loaded successfully:", data);
+                    displayDesserts(data);
+                })
+                .catch(error => console.error("Error loading data.json:", error));
+
+        });
+
+        function displayDesserts(items) {
+    const dessertList = document.getElementById("dessert-list");
+    items.forEach(item => {
+        const dessertCard = document.createElement("div");
+        dessertCard.classList.add("dessert-item");
+        dessertCard.innerHTML = `
+            <img src="${item.image.thumbnail}" alt="${item.name}" class="dessert-image">
+            <h3>${item.name}</h3>
+            <p>${item.category}</p>
+            <p>$${item.price.toFixed(2)}</p>
+            <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+        `;
+        dessertList.appendChild(dessertCard);
+    });
+}
+
+        let cart = [];
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartSection = document.getElementById("cart-items");
+            const cartTotal = document.getElementById("cart-total");
+            cartSection.innerHTML = "";
+            let total = 0;
+            cart.forEach(item => {
+                const cartItem = document.createElement("div");
+                cartItem.innerHTML = `<p>${item.name} - $${item.price.toFixed(2)}</p>`;
+                cartSection.appendChild(cartItem);
+                total += item.price;
+            });
+            cartTotal.textContent = total.toFixed(2);
+        }
+
+        function confirmOrder() {
+            document.getElementById("order-confirmation").classList.remove("hidden");
+        }
+
+        function startNewOrder() {
+            cart = [];
+            updateCartDisplay();
+            document.getElementById("order-confirmation").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
