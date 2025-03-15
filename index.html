@@ -46,7 +46,7 @@
         const dessertCard = document.createElement("div");
         dessertCard.classList.add("dessert-item");
         dessertCard.innerHTML = `
-            <img src="${item.image.thumbnail}" alt="${item.name}" class="dessert-image">
+            <img src="${item.image.desktop}" alt="${item.name}" class="dessert-image">
             <h3>${item.name}</h3>
             <p>${item.category}</p>
             <p>$${item.price.toFixed(2)}</p>
