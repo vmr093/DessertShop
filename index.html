@@ -58,24 +58,40 @@
 
         let cart = [];
 
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            updateCartDisplay();
+            function addToCart(name, price) {
+        let item = cart.find(i => i.name === name);
+        if (item) {
+            item.quantity++;
+        } else {
+            cart.push({ name, price, quantity: 1 });
         }
+        updateCartDisplay();
+    }
+
 
         function updateCartDisplay() {
-            const cartSection = document.getElementById("cart-items");
-            const cartTotal = document.getElementById("cart-total");
-            cartSection.innerHTML = "";
-            let total = 0;
-            cart.forEach(item => {
-                const cartItem = document.createElement("div");
-                cartItem.innerHTML = `<p>${item.name} - $${item.price.toFixed(2)}</p>`;
-                cartSection.appendChild(cartItem);
-                total += item.price;
-            });
-            cartTotal.textContent = total.toFixed(2);
-        }
+    const cartSection = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+    cartSection.innerHTML = "";
+    let total = 0;
+
+    cart.forEach(item => {
+        const cartItem = document.createElement("div");
+        cartItem.classList.add("cart-item");
+        cartItem.innerHTML = `
+            <p>${item.name} - $${item.price.toFixed(2)}</p>
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="changeQuantity('${item.name}', -1)">-</button>
+                <span>${item.quantity}</span>
+                <button class="quantity-btn" onclick="changeQuantity('${item.name}', 1)">+</button>
+            </div>
+        `;
+        cartSection.appendChild(cartItem);
+        total += item.price * item.quantity;
+    });
+
+    cartTotal.textContent = total.toFixed(2);
+}
 
         function confirmOrder() {
             document.getElementById("order-confirmation").classList.remove("hidden");
@@ -86,6 +102,18 @@
             updateCartDisplay();
             document.getElementById("order-confirmation").classList.add("hidden");
         }
+
+        function changeQuantity(name, amount) {
+            let item = cart.find(i => i.name === name);
+            if (item) {
+                item.quantity += amount;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.name !== name);
+                }
+                updateCartDisplay();
+            }
+        }
+
     </script>
 </body>
 </html>
